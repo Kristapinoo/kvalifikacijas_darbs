@@ -21,10 +21,9 @@ from docx import Document
 
 generate_bp = Blueprint('generate', __name__)
 
-# File upload configuration
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'docx'}
-MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+MAX_FILE_SIZE = 10 * 1024 * 1024
 
 def allowed_file(filename):
     """Check if file extension is allowed"""
@@ -48,11 +47,9 @@ def extract_text_from_file(file):
 
     try:
         if file_ext == 'txt':
-            # Read text file
             return file.read().decode('utf-8')
 
         elif file_ext == 'pdf':
-            # Extract text from PDF
             pdf_reader = PyPDF2.PdfReader(file)
             text = ''
             for page in pdf_reader.pages:
@@ -60,7 +57,6 @@ def extract_text_from_file(file):
             return text.strip()
 
         elif file_ext == 'docx':
-            # Extract text from DOCX
             doc = Document(file)
             text = '\n'.join([paragraph.text for paragraph in doc.paragraphs])
             return text.strip()
@@ -87,7 +83,6 @@ def generate_material():
     Returns:
         JSON with generated material data and database ID
     """
-    # Check authentication
     if 'user_id' not in session:
         return jsonify({'error': 'Not authenticated'}), 401
 
@@ -100,7 +95,6 @@ def generate_material():
         num_questions = request.form.get('num_questions', 10, type=int)
         difficulty = request.form.get('difficulty', 'medium')
 
-        # Validation
         if not material_type:
             return jsonify({'error': 'material_type is required'}), 400
 
@@ -111,7 +105,6 @@ def generate_material():
             return jsonify({'error': 'title is required'}), 400
 
         if not content:
-            # Check for file upload
             if 'file' not in request.files:
                 return jsonify({'error': 'Either content or file is required'}), 400
 
@@ -133,7 +126,6 @@ def generate_material():
         if not content or len(content.strip()) == 0:
             return jsonify({'error': 'Content cannot be empty'}), 400
 
-        # Validate parameters for tests
         if material_type == 'test':
             if num_questions < 1 or num_questions > 50:
                 return jsonify({'error': 'num_questions must be between 1 and 50'}), 400
@@ -150,7 +142,6 @@ def generate_material():
                 difficulty=difficulty
             )
 
-            # Validate and clean response
             validated_data = validate_test_response(response)
             cleaned_data = clean_test_data(validated_data)
 
@@ -164,10 +155,9 @@ def generate_material():
                 'data': cleaned_data
             }), 201
 
-        else:  # study_material
+        else:
             response = client.generate_study_material(content=content)
 
-            # Validate and clean response
             validated_data = validate_study_material_response(response)
             cleaned_data = clean_study_material_data(validated_data)
 
@@ -210,12 +200,10 @@ def save_test_to_database(user_id, title, test_data):
     Returns:
         int: Test ID
     """
-    # Create test
     test = Test(user_id=user_id, title=title)
     db.session.add(test)
-    db.session.flush()  # Get test ID
+    db.session.flush()
 
-    # Create assignments and questions
     for assignment_data in test_data['assignments']:
         assignment = Assignment(
             test_id=test.id,
@@ -225,9 +213,8 @@ def save_test_to_database(user_id, title, test_data):
             order_number=assignment_data['order_number']
         )
         db.session.add(assignment)
-        db.session.flush()  # Get assignment ID
+        db.session.flush()
 
-        # Create questions
         for question_data in assignment_data['questions']:
             question = Question(
                 assignment_id=assignment.id,
@@ -238,7 +225,7 @@ def save_test_to_database(user_id, title, test_data):
                 order_number=question_data['order_number']
             )
             db.session.add(question)
-            db.session.flush()  # Get question ID
+            db.session.flush()
 
             # Create question options (for multiple choice, true/false, etc.)
             if question_data.get('options'):
@@ -266,11 +253,11 @@ def save_study_material_to_database(user_id, title, material_data):
     Returns:
         int: Study material ID
     """
-    # Create study material with JSON content
+    # Store material_data as JSON string
     material = StudyMaterial(
         user_id=user_id,
         title=title,
-        content=json.dumps(material_data, ensure_ascii=False)  # Store as JSON string
+        content=json.dumps(material_data, ensure_ascii=False)
     )
     db.session.add(material)
     db.session.commit()

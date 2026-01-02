@@ -51,7 +51,6 @@ def get_all_materials():
                 'terms_count': len(content_data.get('terms', []))
             })
 
-        # Sort by created_at descending
         materials.sort(key=lambda x: x['created_at'], reverse=True)
 
         return jsonify({
@@ -203,7 +202,6 @@ def update_material(material_id):
             if 'title' in data and data['title']:
                 test.title = data['title']
 
-            # Update assignments and questions if provided
             if 'assignments' in data:
                 # Delete existing assignments (CASCADE will delete questions and options)
                 for assignment in test.assignments:
@@ -382,7 +380,6 @@ def generate_additional_questions(material_id):
         if difficulty not in ['easy', 'medium', 'hard']:
             return jsonify({'error': 'difficulty must be "easy", "medium", or "hard"'}), 400
 
-        # Verify test ownership
         test = Test.query.filter_by(id=material_id, user_id=user_id).first()
         if not test:
             return jsonify({'error': 'Test not found'}), 404
@@ -392,7 +389,6 @@ def generate_additional_questions(material_id):
         if not assignment:
             return jsonify({'error': 'Assignment not found'}), 404
 
-        # Generate questions using Claude API
         from services.claude_api import get_claude_client
         from services.parser import validate_test_response, clean_test_data, ParserError
 
@@ -401,12 +397,10 @@ def generate_additional_questions(material_id):
         except Exception as e:
             return jsonify({'error': f'Failed to initialize AI client: {str(e)}'}), 500
 
-        # Create context from assignment
         context = f"Assignment: {assignment_title}\n"
         if assignment_description:
             context += f"Description: {assignment_description}\n"
 
-        # Generate questions
         try:
             response = client.generate_additional_questions(
                 context=context,
@@ -416,7 +410,6 @@ def generate_additional_questions(material_id):
         except Exception as e:
             return jsonify({'error': f'AI generation failed: {str(e)}'}), 500
 
-        # Validate and clean response
         try:
             validated_data = validate_test_response(response)
             cleaned_data = clean_test_data(validated_data)
@@ -432,7 +425,6 @@ def generate_additional_questions(material_id):
         # Determine the starting order_number
         max_order = max([q.order_number for q in assignment.questions], default=0)
 
-        # Add questions to database
         created_questions = []
         for idx, question_data in enumerate(generated_questions):
             question = Question(

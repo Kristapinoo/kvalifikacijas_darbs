@@ -28,7 +28,6 @@ def register():
     try:
         data = request.get_json()
 
-        # Validate request data
         if not data or 'email' not in data or 'password' not in data:
             return jsonify({
                 'error': 'Email and password are required'
@@ -37,13 +36,11 @@ def register():
         email = data['email'].strip().lower()
         password = data['password']
 
-        # Validate email format
         if not validate_email(email):
             return jsonify({
                 'error': 'Invalid email format'
             }), 400
 
-        # Validate password
         if not validate_password(password):
             return jsonify({
                 'error': 'Password must be at least 6 characters long'
@@ -59,7 +56,6 @@ def register():
         # Hash password with bcrypt
         password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
 
-        # Create new user
         new_user = User(
             email=email,
             password_hash=password_hash
@@ -68,7 +64,6 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        # Create session
         session['user_id'] = new_user.id
         session['user_email'] = new_user.email
 
@@ -99,7 +94,6 @@ def login():
     try:
         data = request.get_json()
 
-        # Validate request data
         if not data or 'email' not in data or 'password' not in data:
             return jsonify({
                 'error': 'Email and password are required'
@@ -108,7 +102,6 @@ def login():
         email = data['email'].strip().lower()
         password = data['password']
 
-        # Find user by email
         user = User.query.filter_by(email=email).first()
 
         # Verify user exists and password is correct
@@ -117,7 +110,6 @@ def login():
                 'error': 'Invalid email or password'
             }), 401
 
-        # Create session
         session['user_id'] = user.id
         session['user_email'] = user.email
 
@@ -142,13 +134,11 @@ def logout():
     Logout user (destroy session)
     """
     try:
-        # Check if user is logged in
         if 'user_id' not in session:
             return jsonify({
                 'error': 'No active session'
             }), 401
 
-        # Clear session
         session.clear()
 
         return jsonify({
@@ -169,13 +159,11 @@ def get_current_user():
     from models import User
 
     try:
-        # Check if user is logged in
         if 'user_id' not in session:
             return jsonify({
                 'error': 'Not authenticated'
             }), 401
 
-        # Get user from database
         user = User.query.get(session['user_id'])
 
         if not user:

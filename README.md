@@ -70,7 +70,7 @@ Servera adrese: **http://localhost:5000**
 ```bash
 npm run dev:frontend
 ```
-Aplikācijas adrese: **http://localhost:5173**
+Frontend adrese: **http://localhost:5173**
 
 ## Testēšana
 
@@ -131,4 +131,4 @@ npm run view-db
 ## Autors
 
 Kristaps Kostukevičs (kk23156)
-Kvalifikācijas darbs - 2025
+Kvalifikācijas darbs - 2026

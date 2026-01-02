@@ -64,14 +64,14 @@ def generate_test_docx(test_data):
     date_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
     date_para.runs[0].font.size = Pt(10)
 
-    doc.add_paragraph()  # Blank line
+    doc.add_paragraph()
 
     instructions = doc.add_paragraph()
     instructions.add_run("Instrukcija: ").bold = True
     instructions.add_run("Atbildiet uz visiem jautājumiem. Rakstiet savas atbildes skaidri.")
     instructions.runs[0].font.size = Pt(10)
     instructions.runs[1].font.size = Pt(10)
-    doc.add_paragraph()  # Blank line
+    doc.add_paragraph()
 
     for assignment_idx, assignment in enumerate(test_data['assignments']):
         assignment_num = assignment_idx + 1
@@ -84,18 +84,16 @@ def generate_test_docx(test_data):
         #     desc_para = doc.add_paragraph(assignment['description'])
         #     desc_para.runs[0].font.size = Pt(10)
 
-        # Max points
         max_points = doc.add_paragraph()
         max_points_run = max_points.add_run(f"Maksimālais punktu skaits: {assignment['max_points']}")
         max_points_run.italic = True
         max_points_run.font.size = Pt(10)
 
-        doc.add_paragraph()  # Blank line
+        doc.add_paragraph()
 
         for question_idx, question in enumerate(assignment['questions']):
             question_num = question_idx + 1
 
-            # Question header
             q_header = doc.add_paragraph()
             q_header_run = q_header.add_run(f"Jautājums {question_num}")
             q_header_run.bold = True
@@ -104,46 +102,36 @@ def generate_test_docx(test_data):
             q_header.add_run(f" ({question['points']} punkti)")
             q_header.runs[1].font.size = Pt(10)
 
-            # Question text
             q_text = html.unescape(question['question_text'])
             q_para = doc.add_paragraph(q_text)
             q_para.runs[0].font.size = Pt(10)
 
-            # Options (for multiple choice, true/false, matching)
             if question.get('options') and len(question['options']) > 0:
-                # Special handling for matching questions
                 if question['question_type'] == 'matching':
-                    # Create two-column table for matching
                     from docx.oxml.ns import qn
                     from docx.oxml import OxmlElement
 
-                    # Create table with 3 columns (left items, space, right items)
-                    num_rows = len(question['options']) + 1  # +1 for header
+                    num_rows = len(question['options']) + 1
                     table = doc.add_table(rows=num_rows, cols=3)
                     table.style = 'Table Grid'
 
-                    # Set column widths
                     for row in table.rows:
-                        row.cells[0].width = Inches(2.2)  # Left column
-                        row.cells[1].width = Inches(1.2)  # Space column
-                        row.cells[2].width = Inches(2.2)  # Right column
+                        row.cells[0].width = Inches(2.2)
+                        row.cells[1].width = Inches(1.2)
+                        row.cells[2].width = Inches(2.2)
 
-                    # Header row
                     header_cells = table.rows[0].cells
                     header_cells[0].text = 'Kreisā puse'
                     header_cells[1].text = ''
                     header_cells[2].text = 'Labā puse'
 
-                    # Style header
                     for cell in header_cells:
                         cell.paragraphs[0].runs[0].bold = True
                         cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-                        # Light grey background
                         shading_elm = OxmlElement('w:shd')
                         shading_elm.set(qn('w:fill'), 'D9D9D9')
                         cell._element.get_or_add_tcPr().append(shading_elm)
 
-                    # Data rows
                     for opt_idx, option in enumerate(question['options']):
                         row = table.rows[opt_idx + 1]
                         option_text = option['option_text']
@@ -151,28 +139,22 @@ def generate_test_docx(test_data):
                         left_part = html.unescape(parts[0]) if len(parts) > 0 else ''
                         right_part = html.unescape(parts[1]) if len(parts) > 1 else ''
 
-                        # Number the items
                         left_num = opt_idx + 1
                         right_num = opt_idx + 1
 
-                        # Left cell
                         left_cell = row.cells[0]
                         left_cell.text = f'{left_num}. {left_part}'
 
-                        # Middle cell - empty space
                         row.cells[1].text = ''
 
-                        # Right cell
                         right_cell = row.cells[2]
                         right_cell.text = f'{right_num}. {right_part}'
 
-                        # Set font size for all cells
                         for cell in row.cells:
                             for paragraph in cell.paragraphs:
                                 for run in paragraph.runs:
                                     run.font.size = Pt(10)
 
-                    # Instructions for students
                     instruction_para = doc.add_paragraph()
                     instruction_run = instruction_para.add_run(
                         'Velciet līnijas, lai saskaņotu elementus no kreisās kolonnas ar labo kolonnu.'
@@ -181,25 +163,22 @@ def generate_test_docx(test_data):
                     instruction_run.font.size = Pt(9)
 
                 else:
-                    # Regular options for multiple choice, true/false
                     for opt_idx, option in enumerate(question['options']):
-                        option_letter = chr(65 + opt_idx)  # A, B, C, D
+                        option_letter = chr(65 + opt_idx)
                         option_text = html.unescape(option['option_text'])
 
                         opt_para = doc.add_paragraph(style='List Bullet')
                         opt_run = opt_para.add_run(f"{option_letter}. {option_text}")
                         opt_run.font.size = Pt(10)
 
-            # Space for student answer
             if question['question_type'] in ['short_answer', 'fill_in_blank']:
                 doc.add_paragraph("_" * 80)
             elif question['question_type'] == 'long_answer':
                 for _ in range(4):
                     doc.add_paragraph("_" * 80)
 
-            doc.add_paragraph()  # Blank line between questions
+            doc.add_paragraph()
 
-    # Save to BytesIO
     buffer = BytesIO()
     doc.save(buffer)
     buffer.seek(0)
@@ -237,9 +216,8 @@ def generate_study_material_docx(material_data):
     date_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
     date_para.runs[0].font.size = Pt(10)
 
-    doc.add_paragraph()  # Blank line
+    doc.add_paragraph()
 
-    # Summary section
     summary_heading = doc.add_heading("Kopsavilkums", level=1)
     summary_heading.runs[0].font.size = Pt(13)
 
@@ -250,28 +228,24 @@ def generate_study_material_docx(material_data):
     summary_para = doc.add_paragraph(summary_text)
     summary_para.runs[0].font.size = Pt(11)
 
-    doc.add_paragraph()  # Blank line
+    doc.add_paragraph()
 
-    # Key Terms section
     terms_heading = doc.add_heading("Galvenie termini", level=1)
     terms_heading.runs[0].font.size = Pt(13)
 
     terms = material_data['content'].get('terms', [])
     for term in terms:
-        # Term name
         term_para = doc.add_paragraph()
         term_run = term_para.add_run(term['name'])
         term_run.bold = True
         term_run.font.size = Pt(12)
 
-        # Term definition
         definition = html.unescape(term['definition'])
         def_para = doc.add_paragraph(definition)
         def_para.runs[0].font.size = Pt(11)
 
-        doc.add_paragraph()  # Blank line between terms
+        doc.add_paragraph()
 
-    # Save to BytesIO
     buffer = BytesIO()
     doc.save(buffer)
     buffer.seek(0)

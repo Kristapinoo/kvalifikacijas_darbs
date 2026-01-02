@@ -114,7 +114,6 @@ def generate_test_pdf(test_data, include_answers=True):
         elements.append(Spacer(1, 12))
 
     for assignment_idx, assignment in enumerate(test_data['assignments']):
-
         assignment_num = assignment_idx + 1
         assignment_title = f"Uzdevums {assignment_num}: {assignment['title']}"
         elements.append(Paragraph(assignment_title, heading_style))
@@ -124,36 +123,28 @@ def generate_test_pdf(test_data, include_answers=True):
         #     elements.append(Paragraph(assignment['description'], normal_style))
         #     elements.append(Spacer(1, 6))
 
-
         elements.append(Paragraph(f"<i>Maksimālais punktu skaits: {assignment['max_points']}</i>", normal_style))
         elements.append(Spacer(1, 10))
 
         for question_idx, question in enumerate(assignment['questions']):
             question_num = question_idx + 1
 
-
             q_header = f"<b>Jautājums {question_num}</b> ({question['points']} punkti)"
             elements.append(Paragraph(q_header, question_style))
-
 
             q_text = html.escape(question['question_text'])
             elements.append(Paragraph(q_text, normal_style))
             elements.append(Spacer(1, 6))
 
-            # Options (for multiple choice, true/false, matching)
             if question.get('options') and len(question['options']) > 0:
-                # Special handling for matching questions
                 if question['question_type'] == 'matching':
-
                     table_data = []
-
 
                     table_data.append([
                         Paragraph('<b>Kreisā puse</b>', normal_style),
-                        Paragraph('', normal_style),  # Empty space column
+                        Paragraph('', normal_style),
                         Paragraph('<b>Labā puse</b>', normal_style)
                     ])
-
 
                     for opt_idx, option in enumerate(question['options']):
                         option_text = option['option_text']
@@ -161,44 +152,36 @@ def generate_test_pdf(test_data, include_answers=True):
                         left_part = html.escape(parts[0]) if len(parts) > 0 else ''
                         right_part = html.escape(parts[1]) if len(parts) > 1 else ''
 
-
                         left_num = opt_idx + 1
                         right_num = opt_idx + 1
 
                         table_data.append([
                             Paragraph(f'{left_num}. {left_part}', normal_style),
-                            Paragraph('', normal_style),  # Empty space for drawing lines
+                            Paragraph('', normal_style),
                             Paragraph(f'{right_num}. {right_part}', normal_style)
                         ])
 
-                    # Create table with extra space in middle column
                     matching_table = Table(table_data, colWidths=[2.2*inch, 1.2*inch, 2.2*inch])
                     matching_table.setStyle(TableStyle([
-                        # Header row styling
                         ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
                         ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
                         ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
                         ('FONTNAME', (0, 0), (-1, 0), UNICODE_FONT_BOLD),
                         ('FONTSIZE', (0, 0), (-1, 0), 10),
                         ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-
-                        # Data cells - all columns
                         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                         ('LEFTPADDING', (0, 0), (-1, -1), 8),
                         ('RIGHTPADDING', (0, 0), (-1, -1), 8),
                         ('TOPPADDING', (0, 1), (-1, -1), 6),
                         ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
-
-                        # Grid
-                        ('GRID', (0, 0), (0, -1), 0.5, colors.grey),  # Left column border
-                        ('GRID', (2, 0), (2, -1), 0.5, colors.grey),  # Right column border
+                        ('GRID', (0, 0), (0, -1), 0.5, colors.grey),
+                        ('GRID', (2, 0), (2, -1), 0.5, colors.grey),
                         ('LINEABOVE', (0, 0), (-1, 0), 0.5, colors.grey),
                         ('LINEBELOW', (0, -1), (-1, -1), 0.5, colors.grey),
                     ]))
 
                     elements.append(matching_table)
                     elements.append(Spacer(1, 8))
-
 
                     if not include_answers:
                         elements.append(Paragraph(
@@ -207,12 +190,10 @@ def generate_test_pdf(test_data, include_answers=True):
                         ))
                         elements.append(Spacer(1, 6))
                 else:
-                    # Regular options for multiple choice, true/false
                     for opt_idx, option in enumerate(question['options']):
-                        option_letter = chr(65 + opt_idx)  # A, B, C, D
+                        option_letter = chr(65 + opt_idx)
                         option_text = html.escape(option['option_text'])
 
-                        # Mark correct answer if including answers
                         if include_answers and option['is_correct']:
                             opt_para = Paragraph(
                                 f"<b>{option_letter}. {option_text} ✓</b>",
@@ -224,12 +205,10 @@ def generate_test_pdf(test_data, include_answers=True):
                         elements.append(opt_para)
                         elements.append(Spacer(1, 3))
 
-            # Correct answer (if including answers and not multiple choice/matching)
             if include_answers and question['question_type'] not in ['matching'] and (not question.get('options') or len(question['options']) == 0):
                 answer_text = html.escape(question['correct_answer'])
                 elements.append(Paragraph(f"<b>Atbilde:</b> {answer_text}", answer_style))
 
-            # Space for student answer (if not including answers)
             if not include_answers:
                 if question['question_type'] in ['short_answer', 'fill_in_blank']:
                     elements.append(Spacer(1, 10))
@@ -309,13 +288,11 @@ def generate_study_material_pdf(material_data):
     elements.append(Paragraph(f"Izveidots: {date_str}", normal_style))
     elements.append(Spacer(1, 30))
 
-    # Summary section
     elements.append(Paragraph("Kopsavilkums", heading_style))
     elements.append(Spacer(1, 12))
 
-    # Handle HTML content in summary (from rich text editor)
+    # Handle HTML content in summary (ReportLab supports basic HTML)
     summary_content = material_data['content'].get('summary', '')
-    # Strip HTML tags for PDF (simple approach)
     from html.parser import HTMLParser
 
     class HTMLStripper(HTMLParser):
@@ -332,21 +309,17 @@ def generate_study_material_pdf(material_data):
         def get_data(self):
             return ''.join(self.text)
 
-    # For now, use the HTML content directly with Paragraph (ReportLab supports basic HTML)
     summary_para = Paragraph(summary_content, normal_style)
     elements.append(summary_para)
     elements.append(Spacer(1, 30))
 
-    # Key Terms section
     elements.append(Paragraph("Galvenie termini", heading_style))
     elements.append(Spacer(1, 12))
 
     terms = material_data['content'].get('terms', [])
     for term in terms:
-        # Term name
         elements.append(Paragraph(term['name'], term_style))
 
-        # Term definition
         definition = html.escape(term['definition'])
         elements.append(Paragraph(definition, normal_style))
         elements.append(Spacer(1, 12))
