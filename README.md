@@ -118,10 +118,18 @@ Sistēma izmanto 6 tabulas:
 5. **questions** - jautājumi
 6. **question_options** - atbilžu varianti
 
-Datu bāzi var atjaunot jebkurā brīdī:
+### Datu bāzes komandas
+
+Izveidot datu bāzi (ja vēl nepastāv):
 ```bash
 npm run init-db
 ```
+
+Pilnībā atiestatīt datu bāzi (DZĒŠ VISUS DATUS):
+```bash
+npm run reset-db
+```
+**Brīdinājums:** `reset-db` izdzēsīs visus lietotājus, testus un materiālus!
 
 Apskatīt datu bāzes saturu:
 ```bash

@@ -7,6 +7,7 @@
     "dev:backend": "cd backend && . venv/bin/activate && python app.py",
     "dev:frontend": "cd frontend && npm run dev",
     "init-db": "cd backend && . venv/bin/activate && python init_db.py",
+    "reset-db": "cd backend && . venv/bin/activate && python reset_db.py",
     "view-db": "cd backend && . venv/bin/activate && python view_db.py",
     "test": "cd backend && . venv/bin/activate && python run_tests.py",
     "install:backend": "cd backend && python3 -m venv venv && . venv/bin/activate && pip install -r requirements.txt",

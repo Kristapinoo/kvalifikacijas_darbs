@@ -57,12 +57,14 @@ def generate_test_docx(test_data):
     title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     title_run = title.runs[0]
     title_run.font.size = Pt(18)
+    title_run.font.color.rgb = RGBColor(0, 0, 0)
 
     from datetime import datetime
     date_str = datetime.fromisoformat(test_data['created_at'].replace('Z', '+00:00')).strftime('%B %d, %Y')
     date_para = doc.add_paragraph(f"Izveidots: {date_str}")
     date_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
     date_para.runs[0].font.size = Pt(10)
+    date_para.runs[0].font.color.rgb = RGBColor(0, 0, 0)
 
     doc.add_paragraph()
 
@@ -70,7 +72,9 @@ def generate_test_docx(test_data):
     instructions.add_run("Instrukcija: ").bold = True
     instructions.add_run("Atbildiet uz visiem jautājumiem. Rakstiet savas atbildes skaidri.")
     instructions.runs[0].font.size = Pt(10)
+    instructions.runs[0].font.color.rgb = RGBColor(0, 0, 0)
     instructions.runs[1].font.size = Pt(10)
+    instructions.runs[1].font.color.rgb = RGBColor(0, 0, 0)
     doc.add_paragraph()
 
     for assignment_idx, assignment in enumerate(test_data['assignments']):
@@ -78,6 +82,7 @@ def generate_test_docx(test_data):
 
         assignment_heading = doc.add_heading(f"Uzdevums {assignment_num}: {assignment['title']}", level=1)
         assignment_heading.runs[0].font.size = Pt(13)
+        assignment_heading.runs[0].font.color.rgb = RGBColor(0, 0, 0)
 
         # Skip assignment description (usually contains AI generation prompts)
         # if assignment.get('description'):
@@ -88,6 +93,7 @@ def generate_test_docx(test_data):
         max_points_run = max_points.add_run(f"Maksimālais punktu skaits: {assignment['max_points']}")
         max_points_run.italic = True
         max_points_run.font.size = Pt(10)
+        max_points_run.font.color.rgb = RGBColor(0, 0, 0)
 
         doc.add_paragraph()
 
@@ -98,13 +104,16 @@ def generate_test_docx(test_data):
             q_header_run = q_header.add_run(f"Jautājums {question_num}")
             q_header_run.bold = True
             q_header_run.font.size = Pt(10)
+            q_header_run.font.color.rgb = RGBColor(0, 0, 0)
 
             q_header.add_run(f" ({question['points']} punkti)")
             q_header.runs[1].font.size = Pt(10)
+            q_header.runs[1].font.color.rgb = RGBColor(0, 0, 0)
 
             q_text = html.unescape(question['question_text'])
             q_para = doc.add_paragraph(q_text)
             q_para.runs[0].font.size = Pt(10)
+            q_para.runs[0].font.color.rgb = RGBColor(0, 0, 0)
 
             if question.get('options') and len(question['options']) > 0:
                 if question['question_type'] == 'matching':
@@ -154,6 +163,7 @@ def generate_test_docx(test_data):
                             for paragraph in cell.paragraphs:
                                 for run in paragraph.runs:
                                     run.font.size = Pt(10)
+                                    run.font.color.rgb = RGBColor(0, 0, 0)
 
                     instruction_para = doc.add_paragraph()
                     instruction_run = instruction_para.add_run(
@@ -161,15 +171,17 @@ def generate_test_docx(test_data):
                     )
                     instruction_run.italic = True
                     instruction_run.font.size = Pt(9)
+                    instruction_run.font.color.rgb = RGBColor(0, 0, 0)
 
                 else:
                     for opt_idx, option in enumerate(question['options']):
                         option_letter = chr(65 + opt_idx)
                         option_text = html.unescape(option['option_text'])
 
-                        opt_para = doc.add_paragraph(style='List Bullet')
+                        opt_para = doc.add_paragraph()
                         opt_run = opt_para.add_run(f"{option_letter}. {option_text}")
                         opt_run.font.size = Pt(10)
+                        opt_run.font.color.rgb = RGBColor(0, 0, 0)
 
             if question['question_type'] in ['short_answer', 'fill_in_blank']:
                 doc.add_paragraph("_" * 80)
@@ -209,17 +221,20 @@ def generate_study_material_docx(material_data):
     title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     title_run = title.runs[0]
     title_run.font.size = Pt(18)
+    title_run.font.color.rgb = RGBColor(0, 0, 0)
 
     from datetime import datetime
     date_str = datetime.fromisoformat(material_data['created_at'].replace('Z', '+00:00')).strftime('%B %d, %Y')
     date_para = doc.add_paragraph(f"Izveidots: {date_str}")
     date_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
     date_para.runs[0].font.size = Pt(10)
+    date_para.runs[0].font.color.rgb = RGBColor(0, 0, 0)
 
     doc.add_paragraph()
 
     summary_heading = doc.add_heading("Kopsavilkums", level=1)
     summary_heading.runs[0].font.size = Pt(13)
+    summary_heading.runs[0].font.color.rgb = RGBColor(0, 0, 0)
 
     # Handle HTML content in summary (strip HTML tags)
     summary_content = material_data['content'].get('summary', '')
@@ -227,11 +242,13 @@ def generate_study_material_docx(material_data):
 
     summary_para = doc.add_paragraph(summary_text)
     summary_para.runs[0].font.size = Pt(11)
+    summary_para.runs[0].font.color.rgb = RGBColor(0, 0, 0)
 
     doc.add_paragraph()
 
     terms_heading = doc.add_heading("Galvenie termini", level=1)
     terms_heading.runs[0].font.size = Pt(13)
+    terms_heading.runs[0].font.color.rgb = RGBColor(0, 0, 0)
 
     terms = material_data['content'].get('terms', [])
     for term in terms:
@@ -239,10 +256,12 @@ def generate_study_material_docx(material_data):
         term_run = term_para.add_run(term['name'])
         term_run.bold = True
         term_run.font.size = Pt(12)
+        term_run.font.color.rgb = RGBColor(0, 0, 0)
 
         definition = html.unescape(term['definition'])
         def_para = doc.add_paragraph(definition)
         def_para.runs[0].font.size = Pt(11)
+        def_para.runs[0].font.color.rgb = RGBColor(0, 0, 0)
 
         doc.add_paragraph()
 
