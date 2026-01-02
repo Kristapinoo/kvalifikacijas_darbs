@@ -1,0 +1,29 @@
+# Web Framework
+Flask==3.0.0
+Flask-CORS==4.0.0
+
+# Database
+Flask-SQLAlchemy==3.1.1
+
+# Authentication & Security
+bcrypt==4.1.2
+Flask-Bcrypt==1.0.1
+
+# AI Integration
+anthropic==0.39.0
+
+# PDF Generation
+reportlab==4.0.9
+
+# DOCX Generation
+python-docx==1.1.0
+
+# Environment Variables
+python-dotenv==1.0.0
+
+# File Processing
+PyPDF2==3.0.1
+
+# Testing
+pytest==7.4.3
+pytest-mock==3.12.0

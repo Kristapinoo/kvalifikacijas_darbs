@@ -1,0 +1,27 @@
+{
+  "name": "kvalifikacijas-darbs",
+  "version": "1.0.0",
+  "description": "Mācību materiālu ģenerēšanas sistēma ar MI integrāciju",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && . venv/bin/activate && python app.py",
+    "dev:frontend": "cd frontend && npm run dev",
+    "init-db": "cd backend && . venv/bin/activate && python init_db.py",
+    "view-db": "cd backend && . venv/bin/activate && python view_db.py",
+    "test": "cd backend && . venv/bin/activate && python run_tests.py",
+    "install:backend": "cd backend && python3 -m venv venv && . venv/bin/activate && pip install -r requirements.txt",
+    "install:frontend": "cd frontend && npm install",
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "lint": "cd frontend && npm run lint",
+    "lint:fix": "cd frontend && eslint . --fix",
+    "test:types": "cd frontend && npx tsc --noEmit",
+    "build": "cd frontend && npm run build",
+    "check": "npm run lint && npm run test:types",
+    "check:fix": "npm run lint:fix && npm run test:types"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "author": "Kristaps Kostukevičs (kk23156)",
+  "license": "ISC"
+}
