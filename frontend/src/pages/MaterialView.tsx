@@ -1032,6 +1032,39 @@ const MaterialView: React.FC = () => {
                               gap: '8px'
                             }}
                           >
+                            {editMode && (
+                              <input
+                                type="radio"
+                                name={`correct-${question.id}`}
+                                checked={option.is_correct}
+                                onChange={() => {
+                                  if (!testData) return;
+
+                                  const updatedAssignments = testData.assignments.map(a => {
+                                    if (a.id === assignment.id) {
+                                      const updatedQuestions = a.questions.map(q => {
+                                        if (q.id === question.id && q.options) {
+                                          const updatedOptions = q.options.map(opt => ({
+                                            ...opt,
+                                            is_correct: opt.id === option.id
+                                          }));
+                                          return { ...q, options: updatedOptions };
+                                        }
+                                        return q;
+                                      });
+                                      return { ...a, questions: updatedQuestions };
+                                    }
+                                    return a;
+                                  });
+
+                                  setTestData({
+                                    ...testData,
+                                    assignments: updatedAssignments
+                                  });
+                                }}
+                                style={{ cursor: 'pointer' }}
+                              />
+                            )}
                             <span style={{ fontWeight: 'bold', minWidth: '20px' }}>
                               {String.fromCharCode(65 + optionIndex)}.
                             </span>

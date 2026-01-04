@@ -188,6 +188,11 @@ PRASĪBAS:
    - Pareizajai atbildei
    - Punktu vērtībai (atbilstoši jautājuma tipam - skat. augstāk)
    - Jautājumiem ar multiple_choice: nodrošini 4 atbilžu variantus
+6. Multiple choice jautājumiem:
+   - Variē pareizās atbildes pozīciju katrā jautājumā
+   - Izvairīties no vienas pozīcijas dominances (piemēram, ne visas B)
+   - Pareizā atbilde var būt A, B, C vai D jebkurā jautājumā
+   - Izvieto pareizās atbildes nejauši un vienmērīgi
 
 IZVADES FORMĀTS:
 Atgriez TIKAI derīgu JSON objektu (bez markdown, bez paskaidrojumiem) ar šādu precīzu struktūru:
@@ -200,10 +205,17 @@ Atgriez TIKAI derīgu JSON objektu (bez markdown, bez paskaidrojumiem) ar šādu
       "max_points": 25,
       "questions": [
         {{
-          "question_text": "Jautājuma teksts?",
+          "question_text": "Pirmais jautājums?",
           "question_type": "multiple_choice",
           "options": ["Variants A", "Variants B", "Variants C", "Variants D"],
-          "correct_answer": "Variants B",
+          "correct_answer": "Variants A",
+          "points": 2
+        }},
+        {{
+          "question_text": "Otrais jautājums?",
+          "question_type": "multiple_choice",
+          "options": ["Variants A", "Variants B", "Variants C", "Variants D"],
+          "correct_answer": "Variants D",
           "points": 2
         }},
         {{
@@ -212,6 +224,13 @@ Atgriez TIKAI derīgu JSON objektu (bez markdown, bez paskaidrojumiem) ar šādu
           "options": ["Patiess", "Nepatiess"],
           "correct_answer": "Patiess",
           "points": 1
+        }},
+        {{
+          "question_text": "Trešais jautājums?",
+          "question_type": "multiple_choice",
+          "options": ["Variants A", "Variants B", "Variants C", "Variants D"],
+          "correct_answer": "Variants B",
+          "points": 2
         }},
         {{
           "question_text": "Īsās atbildes jautājums?",
